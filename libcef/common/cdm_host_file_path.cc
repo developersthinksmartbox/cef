@@ -63,6 +63,24 @@ void AddCdmHostFilePaths(
   base::FilePath cef_module;
   CHECK(base::PathService::Get(base::FILE_MODULE, &cef_module));
   if (cef_module != cef_exe) {
+    const auto cef_module_dir = cef_module.DirName();
+
+    const auto cefsharp_sp_dll = cef_module_dir.Append(FILE_PATH_LITERAL("CefSharp.BrowserSubprocess.dll"));
+    const auto cefsharp_sp_dll_sig = GetSigFilePath(cefsharp_sp_dll);
+    DVLOG(2) << __func__ << ": module_path=" << cefsharp_sp_dll.value()
+             << ", signature_path=" << cefsharp_sp_dll_sig.value();
+    if (FileExists(cefsharp_sp_dll) && FileExists(cefsharp_sp_dll_sig)) {
+      cdm_host_file_paths->emplace_back(cefsharp_sp_dll, cefsharp_sp_dll_sig);
+    }
+
+    const auto cefsharp_sp_core_dll = cef_module_dir.Append(FILE_PATH_LITERAL("CefSharp.BrowserSubprocess.Core.dll"));
+    const auto cefsharp_sp_core_dll_sig = GetSigFilePath(cefsharp_sp_core_dll);
+    DVLOG(2) << __func__ << ": module_path=" << cefsharp_sp_core_dll.value()
+             << ", signature_path=" << cefsharp_sp_core_dll_sig.value();
+    if (FileExists(cefsharp_sp_core_dll) && FileExists(cefsharp_sp_core_dll_sig)) {
+      cdm_host_file_paths->emplace_back(cefsharp_sp_core_dll, cefsharp_sp_core_dll_sig);
+    }
+
     const auto cef_module_sig = GetSigFilePath(cef_module);
     DVLOG(2) << __func__ << ": module_path=" << cef_module.value()
              << ", signature_path=" << cef_module_sig.value();
