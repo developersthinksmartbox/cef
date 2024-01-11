@@ -46,30 +46,17 @@ void AddCdmHostFilePaths(
   DCHECK(cdm_host_file_paths->empty());
 
 #if BUILDFLAG(IS_WIN)
-
-  // Find the full path to the current executable.
-  base::FilePath cef_exe;
-  CHECK(base::PathService::Get(base::FILE_EXE, &cef_exe));
-  const auto cef_exe_sig = GetSigFilePath(cef_exe);
-  DVLOG(2) << __func__ << ": exe_path=" << cef_exe.value()
-           << ", signature_path=" << cef_exe_sig.value();
-
-  if (FileExists(cef_exe_sig)) {
-    cdm_host_file_paths->emplace_back(cef_exe, cef_exe_sig);
-  }
-
+  // Only this module is considered for host signing purposes
   // Find the full path to the module. This may be the same as the executable if
   // libcef is statically linked.
   base::FilePath cef_module;
   CHECK(base::PathService::Get(base::FILE_MODULE, &cef_module));
-  if (cef_module != cef_exe) {
-    const auto cef_module_sig = GetSigFilePath(cef_module);
-    DVLOG(2) << __func__ << ": module_path=" << cef_module.value()
-             << ", signature_path=" << cef_module_sig.value();
+  const auto cef_module_sig = GetSigFilePath(cef_module);
+  DVLOG(2) << __func__ << ": module_path=" << cef_module.value()
+            << ", signature_path=" << cef_module_sig.value();
 
-    if (FileExists(cef_module_sig)) {
-      cdm_host_file_paths->emplace_back(cef_module, cef_module_sig);
-    }
+  if (FileExists(cef_module_sig)) {
+    cdm_host_file_paths->emplace_back(cef_module, cef_module_sig);
   }
 
 #elif BUILDFLAG(IS_MAC)
